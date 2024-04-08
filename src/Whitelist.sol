@@ -16,31 +16,26 @@ contract Whitelist {
     constructor(uint8 maxWhitelist) {
         maxWhitelistCount = maxWhitelist;
         ownerAddress = msg.sender;
-        whitelistedAddresses[msg.sender] = true;
-        whitelistCount += 1;
     }
 
     function whitelistUser(address _user) public onlyOwner {
-        addToWhitelist(_user);
-    }
-
-    function addToWhitelist(address _user) internal {
         require(!whitelistedAddresses[_user], "User has already been whitelisted!");
         require(whitelistCount + 1 <= maxWhitelistCount, "Sorry, Whitelist limit exceeded!");
         whitelistedAddresses[_user] = true;
         whitelistCount += 1;
     }
 
-    function whitelist() external {
-        addToWhitelist(msg.sender);
-    } 
+    function addToWhitelist() public {
+        require(!whitelistedAddresses[msg.sender], "User has already been whitelisted!");
+        require(whitelistCount + 1 <= maxWhitelistCount, "Sorry, Whitelist limit exceeded!");
+        whitelistedAddresses[msg.sender] = true;
+        whitelistCount += 1;
+    }
 
     function revokeWhitelist(address _user) public onlyOwner {
-        bool isWhitelisted = whitelistedAddresses[_user];
+        require(whitelistedAddresses[_user], "User is not whitelisted");
         whitelistedAddresses[_user] = false;
-        if(isWhitelisted) {
-            whitelistCount -= 1;
-        }
+        whitelistCount -= 1;
     }
 
     function checkWhitelistStatus() public view returns (bool) {
